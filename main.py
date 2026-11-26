@@ -55,6 +55,13 @@ def main():
     # must be world-readable. Only the file is chmodded, never its
     # directory (the output directory is root-owned on the grader).
     os.chmod(path, 0o644)
+    # Read the file back and make sure what landed on disk is exactly
+    # the line we meant to write: a partial write must fail loudly
+    # here instead of reaching the grader as a truncated entry.
+    with open(path, "r", encoding="utf-8", newline="\n") as handle:
+        written = handle.read()
+    if written != line + "\n":
+        raise ValueError("entry file does not match the entry line")
     print(line)
 
 
